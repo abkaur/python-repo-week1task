@@ -47,40 +47,25 @@ pipeline {
             steps {
                 script {
                     sh '''
+                        # Set up git configuration
                         git config --global user.email "kaurab@sheridancollege.ca"
                         git config --global user.name "abkaur"
-                    '''
 
-                    // Clone the repository and navigate to the directory
-                    sh '''
+                        # Clone the manifest repository
                         rm -rf week2task
                         git clone https://github.com/abkaur/week2task.git
-                        cd week2task/k8s
-                    '''
-                    
-                    // Check if the image in deployment.yaml matches the new image
-                    def imageUpdated = sh(script: '''
-                        cd week2task/k8s
-                        if grep -q "image: $DOCKER_IMAGE" deployment.yaml; then
-                            echo "Image is already up-to-date."
-                            exit 1
-                        else
-                            echo "Updating image..."
-                            sed -i 's|image:.*|image: $DOCKER_IMAGE|g' deployment.yaml
-                            git add deployment.yaml
-                            git commit -m "Update image to $DOCKER_IMAGE"
-                            git push
-                            exit 0
-                        fi
-                    ''', returnStatus: true)
-                    
-                    if (imageUpdated != 0) {
-                        echo "No update needed. Exiting..."
-                        currentBuild.result = 'SUCCESS'
-                        return
-                    }
 
-                    echo "Image updated successfully and pushed to the repository."
+                        # Navigate to the k8s directory
+                        cd week2task/k8s
+
+                        # Update the image in deployment.yaml
+                        sed -i 's|image:.*|image: abkaur95/week2task:1.0.1|' deployment.yaml
+
+                        # Commit and push the changes
+                        git add deployment.yaml
+                        git commit -m "Update image to abkaur95/week2task:1.0.1"
+                        git push
+                    '''
                 }
             }
         }
@@ -90,7 +75,7 @@ pipeline {
             cleanWs() // Clean up the workspace
         }
         success {
-            echo 'Pipeline completed successfully! Image pushed to Docker Hub.'
+            echo 'Pipeline completed successfully! Image pushed to Docker Hub and deployment.yaml updated.'
         }
         failure {
             echo 'Pipeline failed. Please check the logs.'

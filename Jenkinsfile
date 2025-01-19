@@ -46,26 +46,28 @@ pipeline {
         stage('Update Deployment in K8s') {
             steps {
                 script {
-                    sh '''
-                        # Set up git configuration
-                        git config --global user.email "kaurab@sheridancollege.ca"
-                        git config --global user.name "abkaur"
+                    withCredentials([usernamePassword(credentialsId: 'githubcredentials', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                        sh '''
+                            # Set up git configuration
+                            git config --global user.email "kaurab@sheridancollege.ca"
+                            git config --global user.name "abkaur"
 
-                        # Clone the manifest repository
-                        rm -rf week2task
-                        git clone https://github.com/abkaur/week2task.git
+                            # Clone the manifest repository with credentials
+                            rm -rf week2task
+                            git clone https://$GIT_USERNAME:$GIT_PASSWORD@github.com/abkaur/week2task.git
 
-                        # Navigate to the k8s directory
-                        cd week2task/k8s
+                            # Navigate to the k8s directory
+                            cd week2task/k8s
 
-                        # Update the image in deployment.yaml
-                        sed -i 's|image:.*|image: abkaur95/week2task:1.0.1|' deployment.yaml
+                            # Update the image in deployment.yaml
+                            sed -i 's|image:.*|image: abkaur95/week2task:1.0.1|' deployment.yaml
 
-                        # Commit and push the changes
-                        git add deployment.yaml
-                        git commit -m "Update image to abkaur95/week2task:1.0.1"
-                        git push
-                    '''
+                            # Commit and push the changes
+                            git add deployment.yaml
+                            git commit -m "Update image to abkaur95/week2task:1.0.1"
+                            git push https://$GIT_USERNAME:$GIT_PASSWORD@github.com/abkaur/week2task.git
+                        '''
+                    }
                 }
             }
         }

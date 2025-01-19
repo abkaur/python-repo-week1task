@@ -26,7 +26,7 @@ pipeline {
                 script {
                     // Build Docker image with a tag
                     sh '''
-                        docker build -t abkaur95/week2task:1.0.0 -f Dockerfile .
+                        docker build -t abkaur95/week2task:1.0.1 -f Dockerfile .
                     '''
                 }
             }
@@ -37,7 +37,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh '''
                             echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-                            docker push abkaur95/week2task:1.0.0
+                            docker push abkaur95/week2task:1.0.1
                         '''
                     }
                 }

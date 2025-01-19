@@ -55,12 +55,12 @@ pipeline {
                     sh '''
                         rm -rf week2task
                         git clone https://github.com/abkaur/week2task.git
-                        cd week2task/K8s
+                        cd week2task/k8s
                     '''
                     
                     // Check if the image in deployment.yaml matches the new image
                     def imageUpdated = sh(script: '''
-                        cd week2task/K8s
+                        cd week2task/k8s
                         if grep -q "image: $DOCKER_IMAGE" deployment.yaml; then
                             echo "Image is already up-to-date."
                             exit 1
